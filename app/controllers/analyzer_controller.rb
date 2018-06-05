@@ -8,7 +8,7 @@ class AnalyzerController < ApplicationController
       @analyzer = UrlAnalyzer.new(params[:url])
       render json: {body: @analyzer.body}
     else
-      render json: {error: "Please provide a url!"}
+      render json: {error: "Please provide a url!"}, status: :bad_request
     end
   end
 end
