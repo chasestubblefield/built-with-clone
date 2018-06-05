@@ -1,8 +1,32 @@
+#### (Examples use the [jq](https://stedolan.github.io/jq/) utility to parse the JSON response.)
+
 # Part 1
 
 POST a JSON with a `url` you would like to analyze to `/analyze`:
 
-```bash
-$ curl -X POST -H "Content-Type: application/json" -d '{"url":"http://www.example.com"}' http://0.0.0.0:3000/analyze
-{"body":"\u003c!doctype html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n    \u003ctitle\u003eExample Domain\u003c/title\u003e\n\n    \u003cmeta charset=\"utf-8\" /\u003e\n    \u003cmeta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" /\u003e\n    \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /\u003e\n    \u003cstyle type=\"text/css\"\u003e\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    \u003c/style\u003e    \n\u003c/head\u003e\n\n\u003cbody\u003e\n\u003cdiv\u003e\n    \u003ch1\u003eExample Domain\u003c/h1\u003e\n    \u003cp\u003eThis domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.\u003c/p\u003e\n    \u003cp\u003e\u003ca href=\"http://www.iana.org/domains/example\"\u003eMore information...\u003c/a\u003e\u003c/p\u003e\n\u003c/div\u003e\n\u003c/body\u003e\n\u003c/html\u003e\n"}
+```
+$ curl -s -X POST -H "Content-Type: application/json" -d '{"url":"http://www.example.com"}' http://0.0.0.0:3000/analyze | jq '.'
+{
+  "body": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
+}
+```
+
+# Part 2
+
+The response will also include some other information about the URL requested:
+
+```
+$ curl -s -X POST -H "Content-Type: application/json" -d '{"url":"https://getbootstrap.com/"}' http://0.0.0.0:3000/analyze | jq 'del(.body)'
+{
+  "is_html": true,
+  "is_using_bootstrap": true,
+  "is_using_google_analytics": true
+}
+```
+
+You can search for text within the response with the `search` param:
+
+```
+$ curl -s -X POST -H "Content-Type: application/json" -d '{"url":"https://github.com","search":"Microsoft is acquiring GitHub!"}' http://0.0.0.0:3000/analyze | jq '.contains_search_term'
+true
 ```
