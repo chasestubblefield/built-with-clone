@@ -1,5 +1,7 @@
 #### (Examples use the [jq](https://stedolan.github.io/jq/) utility to parse the JSON response.)
 
+#### (Use `bin/setup` script to set up on a new machine.)
+
 # Part 1
 
 POST a JSON with a `url` you would like to analyze to `/analyze`:
